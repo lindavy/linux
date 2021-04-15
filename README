@@ -1,18 +1,13 @@
-Linux kernel
-============
+# HW 1: Discovering VMX Features of Intel Processor
 
-There are several guides for kernel developers and users. These guides can
-be rendered in a number of formats, like HTML and PDF. Please read
-Documentation/admin-guide/README.rst first.
+## Run 1st Module
+Try running "Hello World" module. It is in the 'linux/kernel/hello' directory. 
+```
+make
+```
 
-In order to build the documentation, use ``make htmldocs`` or
-``make pdfdocs``.  The formatted documentation can also be read online at:
+Check the output at the end of '/var/log/kern.log'
+```
+tail /var/log/kern.log
+```
 
-    https://www.kernel.org/doc/html/latest/
-
-There are various text files in the Documentation/ subdirectory,
-several of them using the Restructured Text markup notation.
-
-Please read the Documentation/process/changes.rst file, as it contains the
-requirements for building and running the kernel, and information about
-the problems which may result by upgrading your kernel.
