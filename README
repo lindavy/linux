@@ -1,51 +1,13 @@
 # HW 1: Discovering VMX Features of Intel Processor
+The assignment doesn't require us to edit anything in the kernel itself, 
+Starter code is already given, we made the mappings between control numbers and the descriptions.
 
-## Build Kernel Procedure 
-First clone the forked linux kernel into your local computer or VM, then install the necessary packages to build to the kernel.
-```
-git clone <https link>
-cd linux
-sudo apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc flex libelf-dev bison
-```
-Copy your machine's config file to the current directory.
-```
-cp /boot/config-$(uname -r) .config
-```
-Optionally, you can go to the menuconfig GUI to enable/disable controls. If you're not sure about the control's functions, it's safer to not change it from its default.
-```
-make menuconfig
-```
+Linda Nguyen wrote the mappings for exit controls and primary procbased controls and Dhruwaksh Dave wrote the mappings for Entry controls and secondary procbased controls.
 
-Lastly, you need to comment out these two lines in the *.config* file (that was copied from /boot), so the system will not check for debian certificates.
-```
-CONFIG_SYSTEM_TRUSTED_KEY
-CONFIG_MODULE_SIG_KEY
-```
-If you didn't comment out those lines and run *make*, you will receive the following error midway: 
-```
-make[1]: *** No rule to make target 'debian/canonical-certs.pem', needed by 'certs/x509_certificate_list'.  Stop.
-Makefile:1851: recipe for target 'certs' failed
-make: *** [certs] Error 2
-```
-Now that it's commented out, run make from the root directory (linux/)
-```
-make
-```
-
-## Run 1st Module
-Try running "Hello World" module.
-```
-cd linux/kernel/hello
-make
-```
-Insert the module into the kernel and (optionally) you can view the description.
-```
-sudo insmod hello
-modinfo hello
-```
-
-Check the output at the end of '/var/log/kern.log'
-```
-tail /var/log/kern.log
-```
-
+Steps:
+1. In the cmpe283-1.c file define pre-processor directives for IA32_VMX_ENTRY_CTLS, IA32_VMX_PROCBASED_CTLS2, IA32_VMX_PROCBASED_CTLS and IA32_VMX_EXIT_CTLS with their MSR indices
+2. Define the respetive structs of capability_info for all the controls. These mappings can be found in Intel SDM 24.6.1 and onwards.
+3. Now edit the detect_vmx_features and write the code for all the controls in a similar fashion as the one predefined for pinbased controls.
+4. Save the file and use the "make" command to get the compiled files and kernel object.
+5. Execute the command "sudo insmod cmpe283-1.ko". If everything goes smoothly, no output will be shown.
+6. Run the command "dmesg" and the end of this output stream will have the necessary output.
