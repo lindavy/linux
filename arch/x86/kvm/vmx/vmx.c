@@ -63,6 +63,11 @@
 #include "vmx.h"
 #include "x86.h"
 
+// Assignment 2 Changes
+#include <asm/atomic.h>
+#include <asm/atomic64_64.h>
+#include <asm/msr.h>
+
 MODULE_AUTHOR("Qumranet");
 MODULE_LICENSE("GPL");
 
