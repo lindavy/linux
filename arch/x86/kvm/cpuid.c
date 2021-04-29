@@ -23,6 +23,16 @@
 #include "mmu.h"
 #include "trace.h"
 #include "pmu.h"
+#include <asm/atomic.h>
+
+// 64-bit atomic type
+atomic64_t exit_count = ATOMIC64_INIT(0);
+atomic64_t exit_totaltime = ATOMIC64_INIT(0); 
+
+// Must explicitly export kernel symbol, so that the inserted module is correctly linked
+// EXPORT_SYMBOL_GPL will only show the symbol in GPL licensed modules
+EXPORT_SYMBOL(exit_count); 
+EXPORT_SYMBOL(exit_totaltime); 
 
 /*
  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
@@ -1138,7 +1148,37 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
-	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
+
+	// Assignment 2 Changes
+	if (eax == 0x4FFFFFFF)
+	{
+		printk(KERN_INFO "Updating the eax, ebx and ecx registers!"); 
+
+		// refer to function definition above
+		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+
+		// return the total number of exits (all types) in %eax
+		eax = atomic64_read(&exit_count); 
+		printk(KERN_INFO "Total number of exits in eax=%u", eax);	
+
+		// return the high 32 bits of the total time spent processing all exits in %ebx
+		ebx = (atomic64_read(&exit_totaltime) >> 32); 
+		printk(KERN_INFO "Total time spent during exit=%u (high bits)", ebx);
+
+		// return the low 32 bits of the total time spent processing all exits in %ecx
+		ecx = (atomic64_read(&exit_totaltime) & 0xFFFFFFFF); 
+		printk(KERN_INFO "Total time spent during exit=%u (low bits)", ecx); 
+		
+		printk(KERN_INFO "Total number of exits in exit_count=%llu", atomic64_read(&exit_count));
+
+
+	}
+
+	else
+	{
+		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
+	}
+
 	kvm_rax_write(vcpu, eax);
 	kvm_rbx_write(vcpu, ebx);
 	kvm_rcx_write(vcpu, ecx);
